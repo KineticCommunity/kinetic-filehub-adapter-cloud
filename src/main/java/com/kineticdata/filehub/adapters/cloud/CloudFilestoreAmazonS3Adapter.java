@@ -17,6 +17,7 @@ public class CloudFilestoreAmazonS3Adapter extends CloudFilestoreAdapter {
         public static final String ACCESS_KEY = "Access Key";
         public static final String BUCKET = "Bucket";
         public static final String SECRET_ACCESS_KEY = "Secret Access Key";
+        public static final String ROOT_FOLDER = "Root Folder";
     }
     
     /** 
@@ -33,7 +34,9 @@ public class CloudFilestoreAmazonS3Adapter extends CloudFilestoreAdapter {
             .setIsRequired(true)
             .setIsSensitive(true),
         new ConfigurableProperty(Properties.BUCKET)
-            .setIsRequired(true)
+            .setIsRequired(true),
+        new ConfigurableProperty(Properties.ROOT_FOLDER)
+            .setIsRequired(false)
     );
     
     
@@ -91,6 +94,11 @@ public class CloudFilestoreAmazonS3Adapter extends CloudFilestoreAdapter {
     protected String getContainer() {
         return properties.getValue(Properties.BUCKET);
     }
+    
+    @Override
+    protected String getRootFolder() {
+        return properties.getValue(Properties.ROOT_FOLDER);
+    }
 
     @Override
     protected boolean supportsUploadMultipart() {
@@ -101,7 +109,6 @@ public class CloudFilestoreAmazonS3Adapter extends CloudFilestoreAdapter {
     protected boolean supportsUploadStream() {
         return false;
     }
-    
     
     // TODO: Remove this override and use the super implementation once 
     // jclouds supports adding parameters to signed requests.

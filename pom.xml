@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.kineticdata.filehub.adapters.cloud</groupId>
     <artifactId>kinetic-filehub-adapter-cloud</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <scm>
         <connection>scm:git:https://github.com/KineticCommunity/kinetic-filehub-adapter-cloud.git</connection>
@@ -15,11 +15,6 @@
             <artifactId>guava</artifactId>
             <version>18.0</version>
             <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>com.kineticdata.filehub</groupId>
-            <artifactId>kinetic-filehub-adapter</artifactId>
-            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -46,6 +41,11 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.7.12</version>
+        </dependency>
+        <dependency>
+            <groupId>com.kineticdata.filehub</groupId>
+            <artifactId>kinetic-filehub-adapter</artifactId>
+            <version>1.0.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>

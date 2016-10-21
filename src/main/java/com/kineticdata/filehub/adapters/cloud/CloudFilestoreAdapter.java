@@ -65,6 +65,7 @@ public abstract class CloudFilestoreAdapter implements FilestoreAdapter {
     
     @Override
     public void deleteDocument(String path) {
+        path = getFullPath(path);
         try (
             BlobStoreContext context = buildBlobStoreContext()
         ) {
@@ -82,6 +83,7 @@ public abstract class CloudFilestoreAdapter implements FilestoreAdapter {
     
     @Override
     public Document getDocument(String path) {
+        path = getFullPath(path);
         // Declare the result
         Document result;
         // Try to read from the jCloud BlobStoreContext
@@ -101,6 +103,7 @@ public abstract class CloudFilestoreAdapter implements FilestoreAdapter {
 
     @Override
     public List<? extends Document> getDocuments(String path) throws IOException {
+        path = getFullPath(path);
         // Declare the results
         List<CloudDocument> results = new ArrayList<>();
         // Try to read from the jCloud BlobStoreContext
@@ -145,6 +148,7 @@ public abstract class CloudFilestoreAdapter implements FilestoreAdapter {
 
     @Override
     public void putDocument(String path, InputStream inputStream, String contentType) {
+        path = getFullPath(path);
         try (
             BlobStoreContext context = buildBlobStoreContext()
         ) {
@@ -184,6 +188,7 @@ public abstract class CloudFilestoreAdapter implements FilestoreAdapter {
 
     @Override
     public String getRedirectDelegationUrl(String path, String friendlyFilename) {
+        path = getFullPath(path);
         // Declare the result
         String result;
         // Build the redirect delegation url
@@ -208,6 +213,18 @@ public abstract class CloudFilestoreAdapter implements FilestoreAdapter {
     @Override
     public boolean supportsRedirectDelegation() {
         return true;
+    }
+    
+    protected String getRootFolder() {
+        return "";
+    }
+    
+    protected String getFullPath(String path) {
+        if (!getRootFolder().isEmpty()) {
+            return getRootFolder()+"/"+path;
+        } else {
+            return path;
+        }
     }
 
 }
