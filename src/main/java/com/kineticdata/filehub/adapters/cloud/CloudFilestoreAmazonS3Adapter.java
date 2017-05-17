@@ -17,6 +17,7 @@ public class CloudFilestoreAmazonS3Adapter extends CloudFilestoreAdapter {
         public static final String ACCESS_KEY = "Access Key";
         public static final String BUCKET = "Bucket";
         public static final String SECRET_ACCESS_KEY = "Secret Access Key";
+        public static final String REGION = "Region";
         public static final String ROOT_FOLDER = "Root Folder";
     }
     
@@ -35,6 +36,8 @@ public class CloudFilestoreAmazonS3Adapter extends CloudFilestoreAdapter {
             .setIsSensitive(true),
         new ConfigurableProperty(Properties.BUCKET)
             .setIsRequired(true),
+        new ConfigurableProperty(Properties.REGION)
+            .setIsRequired(false),
         new ConfigurableProperty(Properties.ROOT_FOLDER)
             .setIsRequired(false)
     );
@@ -83,10 +86,17 @@ public class CloudFilestoreAmazonS3Adapter extends CloudFilestoreAdapter {
 
     @Override
     protected BlobStoreContext buildBlobStoreContext() {
+        java.util.Properties overrides = new java.util.Properties();
+        String region = properties.getValue(Properties.REGION);
+        if (region != null && !region.isEmpty()) {
+            overrides.setProperty("aws-s3.endpoint","https://s3-"+region.trim()+".amazonaws.com");
+        }        
+        
         return ContextBuilder.newBuilder("aws-s3")
             .credentials(
                 properties.getValue(Properties.ACCESS_KEY), 
                 properties.getValue(Properties.SECRET_ACCESS_KEY))
+            .overrides(overrides)
             .buildView(BlobStoreContext.class);
     }
 

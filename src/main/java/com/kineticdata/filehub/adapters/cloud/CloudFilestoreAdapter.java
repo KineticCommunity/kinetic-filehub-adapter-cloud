@@ -83,7 +83,7 @@ public abstract class CloudFilestoreAdapter implements FilestoreAdapter {
     
     @Override
     public Document getDocument(String path) {
-        path = getFullPath(path);
+//        path = getFullPath(path);
         // Declare the result
         Document result;
         // Try to read from the jCloud BlobStoreContext
@@ -93,7 +93,7 @@ public abstract class CloudFilestoreAdapter implements FilestoreAdapter {
             // Obtain a reference to the blobstore
             BlobStore blobStore = context.getBlobStore();
             // Obtain a reference to the file
-            Blob blob = blobStore.getBlob(getContainer(), path);
+            Blob blob = blobStore.getBlob(getContainer(), getFullPath(path));
             // Prepare the cloud document
             result = new CloudDocument(path, blob);
         }
@@ -123,22 +123,25 @@ public abstract class CloudFilestoreAdapter implements FilestoreAdapter {
             }
             // For each of the metadatas
             for (StorageMetadata metadata : metadatas) {
+                // If the adapter is using a root folder, pull it off from the front of the metadata name
+                String metadataName = metadata.getName();
+                if (!getRootFolder().isEmpty()) metadataName = metadataName.replace(getRootFolder()+"/", "");
                 // If the record is for a file
                 if (BlobMetadata.class.isAssignableFrom(metadata.getClass())) {
                     Blob blob = blobStore.getBlob(getContainer(), metadata.getName());
                     // If the blob still exists (could have been removed between getting the list of
                     // files and retrieving the blob itself)
                     if (blob != null) {
-                        results.add(new CloudDocument(metadata.getName(), blob));
+                        results.add(new CloudDocument(metadataName, blob));
                     }
                 }
                 // If the record is a container
                 else if (StorageType.CONTAINER.equals(metadata.getType())) {
-                    results.add(new CloudDocument(metadata.getName(), metadata));
+                    results.add(new CloudDocument(metadataName, metadata));
                 }
                 // If the record is a container
                 else {
-                    results.add(new CloudDocument(metadata.getName(), metadata));
+                    results.add(new CloudDocument(metadataName, metadata));
                 }
             }
         }
