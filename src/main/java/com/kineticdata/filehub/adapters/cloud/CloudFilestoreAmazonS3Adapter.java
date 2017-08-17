@@ -26,6 +26,7 @@ public class CloudFilestoreAmazonS3Adapter extends CloudFilestoreAdapter {
     
     /** Defines the collection of property names for the adapter. */
     public static class Properties {
+        public static final String ENCRYPT_FILES = "Encrypt Files";
         public static final String ACCESS_KEY = "Access Key";
         public static final String BUCKET = "Bucket";
         public static final String SECRET_ACCESS_KEY = "Secret Access Key";
@@ -41,6 +42,9 @@ public class CloudFilestoreAmazonS3Adapter extends CloudFilestoreAdapter {
      * application prepares the new Filestore display.
      */
     private final ConfigurablePropertyMap properties = new ConfigurablePropertyMap(
+        new ConfigurableProperty(Properties.ENCRYPT_FILES).setIsRequired(true)
+            .setDescription("Add AES256 Server Side Encryption to files on upload")
+            .addPossibleValues("Yes","No"),
         new ConfigurableProperty(Properties.ACCESS_KEY)
             .setIsRequired(true),
         new ConfigurableProperty(Properties.SECRET_ACCESS_KEY)
@@ -142,40 +146,45 @@ public class CloudFilestoreAmazonS3Adapter extends CloudFilestoreAdapter {
     
     @Override
     public void putDocument(String path, InputStream inputStream, String contentType) {
-        path = getFullPath(path);
-        try (
-            BlobStoreContext context = buildBlobStoreContext()
-        ) { 
-            // Obtain the S3 Client from the context
-            AWSS3Client s3Client = context.unwrapApi(AWSS3Client.class);
-            
-            try {
-                // Write the file to a temorary location
-                Path tempFile = Files.createTempFile("kinetic-filehub", ".tmp");
-                IOUtils.copyLarge(inputStream, new FileOutputStream(tempFile.toFile()));
-                
-                // Set the encryption options
-                AWSS3PutObjectOptions options = new AWSS3PutObjectOptions();
-                options.serverSideEncryption(ObjectMetadata.ServerSideEncryption.AES256);
-                
-                // Set the content type/length metadata
-                MutableContentMetadata md = new BaseMutableContentMetadata();
-                md.setContentLength(Files.size(tempFile));
-                md.setContentType(contentType);
-                
-                // Create the S3 Object
-                S3Object s3Object = s3Client.newS3Object();
-                s3Object.setPayload(new FileInputStream(tempFile.toFile()));
-                s3Object.getMetadata().setKey(path);
-                s3Object.getPayload().setContentMetadata(md);
-            
-                // Put the encrypted object to s3
-                s3Client.putObject(getContainer(), s3Object, options);
-                // Delete the tempfile
-                tempFile.toFile().delete();
-            } catch (Exception e) {
-                throw new RuntimeException("Unable to stream file", e);
+        Boolean encryptionEnabled = "Yes".equals(properties.getValue(Properties.ENCRYPT_FILES));
+        if (encryptionEnabled) {
+            path = getFullPath(path);
+            try (
+                BlobStoreContext context = buildBlobStoreContext()
+            ) { 
+                // Obtain the S3 Client from the context
+                AWSS3Client s3Client = context.unwrapApi(AWSS3Client.class);
+
+                try {
+                    // Write the file to a temorary location
+                    Path tempFile = Files.createTempFile("kinetic-filehub", ".tmp");
+                    IOUtils.copyLarge(inputStream, new FileOutputStream(tempFile.toFile()));
+
+                    // Set the encryption options
+                    AWSS3PutObjectOptions options = new AWSS3PutObjectOptions();
+                    options.serverSideEncryption(ObjectMetadata.ServerSideEncryption.AES256);
+
+                    // Set the content type/length metadata
+                    MutableContentMetadata md = new BaseMutableContentMetadata();
+                    md.setContentLength(Files.size(tempFile));
+                    md.setContentType(contentType);
+
+                    // Create the S3 Object
+                    S3Object s3Object = s3Client.newS3Object();
+                    s3Object.setPayload(new FileInputStream(tempFile.toFile()));
+                    s3Object.getMetadata().setKey(path);
+                    s3Object.getPayload().setContentMetadata(md);
+
+                    // Put the encrypted object to s3
+                    s3Client.putObject(getContainer(), s3Object, options);
+                    // Delete the tempfile
+                    tempFile.toFile().delete();
+                } catch (Exception e) {
+                    throw new RuntimeException("Unable to stream file", e);
+                }
             }
+        } else {
+            super.putDocument(path, inputStream, contentType);
         }
     }
     
