@@ -24,9 +24,11 @@ public class CloudDocument implements Document {
     }
     
     public CloudDocument(String path, StorageMetadata storageMetadata) {
+        // Remove a possible trailing / from a s3 directory
+        String strippedPath = path.endsWith("/") ? path.replaceAll("/$", "") : path;
         this.blob = null;
-        this.name = path.contains("/") ? path.substring(path.lastIndexOf("/")+1) : path;
-        this.path = path;
+        this.name = strippedPath.contains("/") ? strippedPath.substring(strippedPath.lastIndexOf("/")+1) : strippedPath;
+        this.path = strippedPath;
         this.storageMetadata = storageMetadata;
     }
 
