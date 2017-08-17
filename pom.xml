@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.kineticdata.filehub.adapters.cloud</groupId>
     <artifactId>kinetic-filehub-adapter-cloud</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <scm>
         <connection>scm:git:https://github.com/KineticCommunity/kinetic-filehub-adapter-cloud.git</connection>
         <developerConnection>scm:git:https://github.com/KineticCommunity/kinetic-filehub-adapter-cloud.git</developerConnection>
     </scm>
-    
+
     <distributionManagement>
         <repository>
             <id>com.kineticdata</id>
@@ -27,7 +27,7 @@
           <url>http://utilities.kineticdata.com/nexus/content/repositories/releases/</url>
         </repository>
     </repositories>
-    
+
     <dependencies>
         <dependency>
             <groupId>com.kineticdata.filehub</groupId>
@@ -53,8 +53,8 @@
         </dependency>
         <dependency>
             <groupId>org.apache.jclouds</groupId>
-            <artifactId>jclouds-all</artifactId>
-            <version>1.9.0</version>
+            <artifactId>jclouds-all-kinetic</artifactId>
+            <version>2.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
