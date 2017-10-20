@@ -26,6 +26,10 @@
           <id>com.kineticdata</id>
           <url>http://utilities.kineticdata.com/nexus/content/repositories/releases/</url>
         </repository>
+        <repository>
+          <id>com.kineticdata.snapshots</id>
+          <url>http://utilities.kineticdata.com/nexus/content/repositories/snapshots</url>
+        </repository>
     </repositories>
 
     <dependencies>
